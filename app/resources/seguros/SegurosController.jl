@@ -1,6 +1,7 @@
 module SegurosController
 
-using GenieAuthentication, Genie.Renderer, Genie.Exceptions, Genie.Renderer.Html, SearchLight
+using GenieAuthentication, Genie.Renderer, Genie.Exceptions, Genie.Renderer.Json, SearchLight
+using OXEBankingSeguros.Seguros
 
 function index()
   seguros = SearchLight.all(Seguro)

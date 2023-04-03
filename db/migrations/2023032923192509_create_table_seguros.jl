@@ -12,6 +12,9 @@ function up()
       column(:vigencia, :int)
       column(:simulacao, :bool)
       column(:data, :string)
+      column(:tipo, :int)
+      column(:objeto_id, :int)
+      column(:segurado_id, :int)
     ]
   end
 end

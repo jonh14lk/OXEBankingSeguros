@@ -18,9 +18,7 @@ function show()
 end
 
 function create()
-  segurado = Segurado(documento=jsonpayload("documento"),
-    conta=jsonpayload("conta"),
-    nascimento=jsonpayload("nascimento"))
+  segurado = SearchLight.createwith(Segurado, jsonpayload())
   save(segurado)
   json(segurado)
 end
@@ -30,11 +28,9 @@ function update()
   if segurado === nothing
     return JSONException(status=NOT_FOUND, message="Item not found") |> json
   end
-  segurado.documento = jsonpayload("documento")
-  segurado.conta = jsonpayload("conta")
-  segurado.nascimento = jsonpayload("nascimento")
-  save(segurado)
-  json(segurado)
+  new_segurado = SearchLight.updatewith(segurado, jsonpayload())
+  save(new_segurado)
+  json(new_segurado)
 end
 
 

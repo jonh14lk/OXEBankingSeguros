@@ -10,4 +10,8 @@ end
 
 route("/seguros", SegurosController.index)
 
-route("/segurados", SeguradosController.index)
+route("/segurados", SeguradosController.index, method=GET)
+route("/segurados", SeguradosController.create, method=POST)
+route("/segurados/:id::Int", SeguradosController.update, method=POST)
+route("/segurados/:id::Int", SeguradosController.show, method=GET)
+route("/segurados/:id::Int", SeguradosController.delete, method=DELETE)

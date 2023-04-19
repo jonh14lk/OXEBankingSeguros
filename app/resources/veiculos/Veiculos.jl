@@ -11,6 +11,7 @@ export Veiculo
   ano::Int = 2000
   condicao::Int = 1
   seguro_id::Int = 0
+  modelo::String = ""
 end
 
 end

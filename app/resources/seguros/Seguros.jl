@@ -13,7 +13,7 @@ export Seguro
   vigencia::Int = 365
   simulacao::Bool = 1
   data::String = ""
-  tipo::Int = 1 # 1 = residencial, 2 = veicular, 3 = viagem
+  tipo::Int = 1 # 1 = auto, 2 = residencial, 3 = viagem
   objeto_id::Int = 0
   segurado_id::Int = 0
 end

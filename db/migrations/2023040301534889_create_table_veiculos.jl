@@ -10,6 +10,7 @@ function up()
       column(:ano, :int)
       column(:condicao, :int)
       column(:seguro_id, :int)
+      column(:modelo, :string)
     ]
   end
 

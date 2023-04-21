@@ -2,7 +2,7 @@ module SeguradosController
 
 using GenieAuthentication, Genie.Renderer, Genie.Exceptions, Genie.Renderer.Json, Genie.Router, Genie.Requests
 using SearchLight, SearchLight.Validation
-using OXEBankingSeguros.Segurados
+using OXEBankingSeguros.Segurados, OXEBankingSeguros.Seguros
 
 function index()
   segurados = SearchLight.all(Segurado)
@@ -41,6 +41,17 @@ function delete()
   end
   SearchLight.delete(segurado)
   json(Dict(:id => (:value => params(:id))))
+end
+
+function listarSeguros()
+  segurado = findone(Segurado, id=params(:id))
+
+  if segurado === nothing
+    return JSONException(status=NOT_FOUND, message="Segurado não encontrado") |> json
+  end
+
+  seguros = SearchLight.find(Seguro, SQLWhereExpression("segurado_id = ?", params(:id)))
+  json(seguros)
 end
 
 end

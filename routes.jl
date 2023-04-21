@@ -17,6 +17,7 @@ route("/segurados", SeguradosController.create, method=POST)
 route("/segurados/:id::Int", SeguradosController.update, method=POST)
 route("/segurados/:id::Int", SeguradosController.show, method=GET)
 route("/segurados/:id::Int", SeguradosController.delete, method=DELETE)
+route("/segurados/:id::Int/seguros", SeguradosController.listarSeguros, method=GET)
 
 route("/residencias", ResidenciasController.index, method=GET)
 route("/residencias", ResidenciasController.create, method=POST)

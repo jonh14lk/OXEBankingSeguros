@@ -2,7 +2,7 @@ module SegurosController
 
 using GenieAuthentication, Genie.Renderer, Genie.Exceptions, Genie.Renderer.Json, Genie.Router, Genie.Requests
 using SearchLight, SearchLight.Validation
-using OXEBankingSeguros.Seguros, OXEBankingSeguros.Veiculos, OXEBankingSeguros.Viagems, OXEBankingSeguros.Segurados
+using OXEBankingSeguros.Seguros, OXEBankingSeguros.Residencias, OXEBankingSeguros.Veiculos, OXEBankingSeguros.Viagems, OXEBankingSeguros.Segurados
 using Dates
 
 function index()
@@ -48,8 +48,10 @@ end
 function simularSeguro()
 
   # Busca segurado
-  segurado_id = jsonpayload("segurado_id")
-  s = findone(Segurado, id=segurado_id)
+  if haskey(jsonpayload(), "segurado_id")
+    segurado_id = jsonpayload("segurado_id")
+    s = findone(Segurado, id=segurado_id)
+  end
 
   # Se não achou, vai tentar criar um novo
   if s === nothing
@@ -98,7 +100,7 @@ function simularSeguro()
     
     objeto = v
   
-    # Tratando seguro residencial
+  # Tratando seguro residencial
   elseif tipo == 2
     if !haskey(jsonpayload(), "residencia")
       return JSONException(status=BAD_REQUEST, message="Residência não informada") |> json
@@ -109,7 +111,27 @@ function simularSeguro()
     v |> SearchLight.save!!
     objeto = v
     
-    valor_seguro = 0.15 * objeto.valor
+    # Regra 1: valor base de 2,5% da residencia
+    valor_seguro = 0.025 * objeto.valor
+
+    # Regra 2: Valor aumenta se residencia tem 25 ou mais anos
+    ano_atual = Year(today())
+    ano_res = Year(v.ano)
+    diff_anos = ano_atual - ano_res
+
+    if diff_anos == Year(0) || diff_anos >= Year(25)
+      valor_seguro += 0.15 * valor_seguro 
+    end
+
+    # Regra 3: Valor aumenta de acordo com a condição da casa
+    if v.condicao == 2 # 1 = boa, 2 = ruim ???
+      valor_seguro += 0.1 * valor_seguro 
+    end
+
+    # Regra 4: Valor aumenta de acordo com a localização da casa
+    if v.condicao == 2 # 1 = comum, 2 = área de risco ???
+      valor_seguro += 0.1 * valor_seguro 
+    end
   
   # Tratando seguro de viagens
   elseif tipo == 3
@@ -122,7 +144,27 @@ function simularSeguro()
     v |> SearchLight.save!!
     objeto = v
 
-    valor_seguro = 0.15 * objeto.valor
+    # Regra 1: valor base de 10% da viagem
+    valor_seguro = 0.1 * objeto.valor
+
+    # Regra 2: Valor aumenta se for internacional
+    if v.internacional
+      valor_seguro += 0.5 * valor_seguro 
+    end
+
+    # Regra 3: Valor aumenta de acordo com meio de transporte
+    if v.meioTransporte == 1 # 1 = rodoviario, 2 = aereo, 3 = maritimo
+      valor_seguro += 0.1 * valor_seguro
+    elseif v.meioTransporte == 2
+      valor_seguro += 0.25 * valor_seguro
+    elseif v.meioTransporte == 3
+      valor_seguro += 0.2 * valor_seguro
+    end
+
+    # Regra 4: Valor aumenta se destino não for seguro
+    if !v.destinoSeguro
+      valor_seguro += 0.5 * valor_seguro
+    end
   
   else
     return JSONException(status=BAD_REQUEST, message="Tipo inválido") |> json

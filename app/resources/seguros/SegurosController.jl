@@ -75,7 +75,7 @@ function simularSeguro()
     if !haskey(jsonpayload(), "veiculo")
       return JSONException(status=BAD_REQUEST, message="Veículo não informado") |> json
     end
-    
+
     dados_veiculo = Dict(jsonpayload("veiculo"))
     v = SearchLight.createwith(Veiculo, dados_veiculo)
     v |> SearchLight.save!!
@@ -83,24 +83,24 @@ function simularSeguro()
 
     # Regra 1: Valor base do seguro = 5% do valor do carro
     valor_seguro = 0.05 * v.valor
-    
+
     # Regra 2: Valor aumenta se carro é do ano ou se tem 10 ou mais anos
     ano_atual = Year(today())
     ano_carro = Year(v.ano)
     diff_anos = ano_atual - ano_carro
 
     if diff_anos == Year(0) || diff_anos >= Year(10)
-      valor_seguro += 0.1 * valor_seguro 
+      valor_seguro += 0.1 * valor_seguro
     end
 
     # Regra 3: Valor aumenta de acordo com a condição do carro
     if v.condicao == 2 # 1 = boa, 2 = ruim ???
-      valor_seguro += 0.1 * valor_seguro 
+      valor_seguro += 0.1 * valor_seguro
     end
-    
+
     objeto = v
-  
-  # Tratando seguro residencial
+
+    # Tratando seguro residencial
   elseif tipo == 2
     if !haskey(jsonpayload(), "residencia")
       return JSONException(status=BAD_REQUEST, message="Residência não informada") |> json
@@ -110,7 +110,7 @@ function simularSeguro()
     v = SearchLight.createwith(Residencia, dados_residencia)
     v |> SearchLight.save!!
     objeto = v
-    
+
     # Regra 1: valor base de 2,5% da residencia
     valor_seguro = 0.025 * objeto.valor
 
@@ -120,20 +120,20 @@ function simularSeguro()
     diff_anos = ano_atual - ano_res
 
     if diff_anos == Year(0) || diff_anos >= Year(25)
-      valor_seguro += 0.15 * valor_seguro 
+      valor_seguro += 0.15 * valor_seguro
     end
 
     # Regra 3: Valor aumenta de acordo com a condição da casa
     if v.condicao == 2 # 1 = boa, 2 = ruim ???
-      valor_seguro += 0.1 * valor_seguro 
+      valor_seguro += 0.1 * valor_seguro
     end
 
     # Regra 4: Valor aumenta de acordo com a localização da casa
     if v.condicao == 2 # 1 = comum, 2 = área de risco ???
-      valor_seguro += 0.1 * valor_seguro 
+      valor_seguro += 0.1 * valor_seguro
     end
-  
-  # Tratando seguro de viagens
+
+    # Tratando seguro de viagens
   elseif tipo == 3
     if !haskey(jsonpayload(), "viagem")
       return JSONException(status=BAD_REQUEST, message="Viagem não informada") |> json
@@ -149,7 +149,7 @@ function simularSeguro()
 
     # Regra 2: Valor aumenta se for internacional
     if v.internacional
-      valor_seguro += 0.5 * valor_seguro 
+      valor_seguro += 0.5 * valor_seguro
     end
 
     # Regra 3: Valor aumenta de acordo com meio de transporte
@@ -165,7 +165,7 @@ function simularSeguro()
     if !v.destinoSeguro
       valor_seguro += 0.5 * valor_seguro
     end
-  
+
   else
     return JSONException(status=BAD_REQUEST, message="Tipo inválido") |> json
   end
@@ -185,6 +185,32 @@ function simularSeguro()
   )
 
   json(retorno)
+end
+
+function doPayment()
+  return true # Não implementado
+end
+
+function contratarSeguro()
+  # Aqui, o objetivo é contratar o seguro feito antes em uma simulação
+
+  # Busca seguro
+  seguro = findone(Seguro, id=params(:id))
+
+  # Se não achou, retorna
+  if seguro === nothing
+    return JSONException(status=BAD_REQUEST, message="Seguro não existente") |> json
+  end
+
+  # Tenta fazer o pagamento, e se der certo, muda a flag de simulação
+  if doPayment()
+    seguro.simulacao = false
+    save(seguro)
+    return json(seguro)
+  end
+
+  # Erro no pagamento
+  return JSONException(status=402, message="Erro ao realizar pagamento") |> json
 end
 
 end

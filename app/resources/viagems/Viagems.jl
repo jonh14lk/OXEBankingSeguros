@@ -7,6 +7,7 @@ export Viagem
 
 @kwdef mutable struct Viagem <: AbstractModel
   id::DbId = DbId()
+  valor::Float64 = 0.0
   meioTransporte::Int = 1
   destino::String = ""
   internacional::Bool = false

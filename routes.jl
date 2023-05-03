@@ -11,6 +11,7 @@ route("/seguros/:id::Int", SegurosController.update, method=POST)
 route("/seguros/:id::Int", SegurosController.show, method=GET)
 route("/seguros/:id::Int", SegurosController.delete, method=DELETE)
 route("/simular", SegurosController.simularSeguro, method=POST)
+route("/contratar/:id::Int", SegurosController.contratarSeguro, method=POST)
 
 route("/segurados", SeguradosController.index, method=GET)
 route("/segurados", SeguradosController.create, method=POST)

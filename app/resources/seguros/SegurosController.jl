@@ -46,7 +46,8 @@ end
 
 
 function simularSeguro()
-
+  s = nothing
+  
   # Busca segurado
   if haskey(jsonpayload(), "segurado_id")
     segurado_id = jsonpayload("segurado_id")

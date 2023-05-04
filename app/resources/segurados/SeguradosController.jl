@@ -50,7 +50,7 @@ function listarSeguros()
     return JSONException(status=NOT_FOUND, message="Segurado não encontrado") |> json
   end
   
-  seguros = SearchLight.find(Seguro, SQLWhereExpression("segurado_id = ? and ", params(:id)))
+  seguros = SearchLight.find(Seguro, SQLWhereExpression("segurado_id = ?", params(:id)))
   
   retorno = []
 

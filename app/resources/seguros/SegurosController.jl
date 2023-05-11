@@ -37,6 +37,9 @@ end
 
 function delete()
   seguro = findone(Seguro, id=params(:id))
+  if seguro.simulacao == false
+    return JSONException(status=BAD_REQUEST, message="Esse seguro não é uma simulação") |> json
+  end
   if seguro === nothing
     return JSONException(status=NOT_FOUND, message="Item not found") |> json
   end
@@ -47,7 +50,7 @@ end
 
 function simularSeguro()
   s = nothing
-  
+
   # Busca segurado
   if haskey(jsonpayload(), "segurado_id")
     segurado_id = jsonpayload("segurado_id")
